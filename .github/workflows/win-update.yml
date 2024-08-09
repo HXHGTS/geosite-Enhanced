@@ -55,7 +55,7 @@ jobs:
           echo "Force updating repository with local content..."
           git checkout -b Release
           sudo git add geosite
-          git commit -m "Update Azure ip geosite"
+          git commit -m "Update Windows Update srs"
           git push --force origin Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
