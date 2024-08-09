@@ -3,7 +3,7 @@ name: Compile sing-box Geoip telegram
 on:
   push:
     branches:
-      - main
+      - Release
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
@@ -37,30 +37,30 @@ jobs:
         run: |
           jq -n --rawfile ips telegram.txt '{"version": 1, "rules": [{"ip_cidr": ($ips | split("\n") | map(select(length > 0)))}]}' > telegram.json
 
-      - name: Compile Source
-        run: |
-          sing-box rule-set compile --output geoip-telegram.srs telegram.json
-
       - name: Pull code from remote
-        run: gh repo clone HXHGTS/geosite-Enhanced -- -b Release
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          gh repo clone HXHGTS/geosite-Enhanced -- -b Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
-      - name: Prepare geoip Folder
+      - name: Check and Create geoip Folder
         run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          sudo mkdir -p geoip
-          sudo mv -f geoip-telegram.srs geoip
-          sudo chown -R $USER:$USER geoip
-          sudo chmod -R 755 geoip
+          if [ ! -d "geosite-Enhanced/geoip" ]; then
+            sudo mkdir -p geosite-Enhanced/geoip
+          fi
+
+      - name: Compile Source
+        run: |
+          sing-box rule-set compile --output geosite-Enhanced/geoip/geoip-telegram.srs telegram.json
 
       - name: Push Files
         run: |
           echo "Force updating repository with local content..."
           git checkout -b Release
-          sudo git add geoip geosite
+          sudo git add geosite-Enhanced/geoip geosite-Enhanced/geosite
           git commit -m "Update Telegram srs"
           git push --force origin Release
         env:
