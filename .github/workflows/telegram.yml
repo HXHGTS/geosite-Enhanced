@@ -41,6 +41,12 @@ jobs:
         run: |
           sing-box rule-set compile --output geoip-telegram.srs telegram.json
 
+      - name: Pull code from remote
+        run: gh repo clone HXHGTS/geosite-Enhanced -- -b Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
       - name: Prepare geoip Folder
         run: |
           git config --global user.name 'github-actions'
@@ -54,8 +60,9 @@ jobs:
         run: |
           echo "Force updating repository with local content..."
           git checkout -b Release
-          sudo git add geoip
+          sudo git add geoip geosite
           git commit -m "Update Telegram srs"
           git push --force origin Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
