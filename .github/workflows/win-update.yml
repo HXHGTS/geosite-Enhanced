@@ -60,7 +60,7 @@ jobs:
         run: |
           echo "Force updating repository with local content..."
           git checkout -b Release
-          sudo git add geosite
+          sudo git add geosite geoip
           git commit -m "Update Windows Update srs"
           git push --force origin Release
         env:
