@@ -39,14 +39,20 @@ jobs:
 
       - name: Compile Source
         run: |
-          sing-box rule-set compile --output geoip-winupdate.srs win-update.json
+          sing-box rule-set compile --output geosite-winupdate.srs win-update.json
+
+      - name: Pull code from remote
+        run: gh repo clone HXHGTS/geosite-Enhanced -- -b Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
 
       - name: Prepare geosite Folder
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           sudo mkdir -p geosite
-          sudo mv -f geoip-winupdate.srs geosite
+          sudo mv -f geosite-winupdate.srs geosite
           sudo chown -R $USER:$USER geosite
           sudo chmod -R 755 geosite
 
