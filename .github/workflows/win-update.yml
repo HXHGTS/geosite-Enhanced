@@ -45,16 +45,23 @@ jobs:
 
       - name: Compile Source
         run: |
-          sing-box rule-set compile --output geosite-Enhanced/geosite/geosite-winupdate.srs win-update.json
+          sing-box rule-set compile --output geosite-Enhanced/geoip/geoip-winupdate.srs win-update.json
 
-      - name: Push Files
+      - name: Prepare Folders
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
+          sudo mkdir -p geosite-Enhanced/geoip
+          sudo chown -R $USER:$USER geosite-Enhanced/geoip
+          sudo chmod -R 755 geosite-Enhanced/geoip
+
+      - name: Push Files
+        run: |
           echo "Force updating repository with local content..."
           git checkout -b Release
-          git add geosite-Enhanced/geosite geosite-Enhanced/geoip
+          git add geosite-Enhanced/geoip geosite-Enhanced/geosite
           git commit -m "Update Windows Update srs"
           git push --force origin Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
