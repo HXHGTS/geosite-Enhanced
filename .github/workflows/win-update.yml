@@ -37,30 +37,23 @@ jobs:
         run: |
           jq -n --rawfile domains win-update.txt '{"version": 1, "rules": [{"domain": ($domains | split("\n") | map(select(length > 0)))}]}' > win-update.json
 
-      - name: Compile Source
-        run: |
-          sing-box rule-set compile --output geosite-winupdate.srs win-update.json
-
       - name: Pull code from remote
         run: gh repo clone HXHGTS/geosite-Enhanced -- -b Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
-      - name: Prepare geosite Folder
+      - name: Compile Source
         run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          sudo mkdir -p geosite
-          sudo mv -f geosite-winupdate.srs geosite
-          sudo chown -R $USER:$USER geosite
-          sudo chmod -R 755 geosite
+          sing-box rule-set compile --output geosite-Enhanced/geosite/geosite-winupdate.srs win-update.json
 
       - name: Push Files
         run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
           echo "Force updating repository with local content..."
           git checkout -b Release
-          sudo git add geosite geoip
+          git add geosite-Enhanced/geosite geosite-Enhanced/geoip
           git commit -m "Update Windows Update srs"
           git push --force origin Release
         env:
